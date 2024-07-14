@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Customers {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  firstName  String
+  lastName   String
+  email      String
+  phone      String
+  isApproved Boolean
+  createdAt  DateTime  @default(now())
+  createdBy  Int
+  updatedAt  DateTime?
+  updatedBy  Int?
+}
+
+model Clients {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clientName  String
+  clientType  String
+  taxNumber   String
+  taxOffice   String
+  status      String
+  country     String
+  city        String
+  address     String
+  isApproved  Boolean
+  createdAt   DateTime      @default(now())
+  createdBy   Int
+  updatedAt   DateTime?
+  updatedBy   Int?
+  clientUsers ClientUsers[]
+}
+
+model ClientUsers {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  firstName String
+  lastName  String
+  email     String
+  phone     String
+  clientId  String    @db.Uuid
+  createdAt DateTime  @default(now())
+  createdBy Int
+  updatedAt DateTime?
+  updatedBy Int?
+
+  clients Clients @relation(fields: [clientId], references: [id])
+}
