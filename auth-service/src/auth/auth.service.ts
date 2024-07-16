@@ -34,9 +34,9 @@ export class AuthService {
 
     await this.redisService.set(email, generatedHash);
 
-    const foundUser = await this.prismaService.customers.findUnique({
+    const foundUser = await this.prismaService.customers.findFirst({
       where: {
-        email,
+        OR: [{ email }, { phone }],
       },
     });
 
