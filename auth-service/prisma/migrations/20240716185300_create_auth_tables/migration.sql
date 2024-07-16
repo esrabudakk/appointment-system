@@ -5,9 +5,9 @@ CREATE TABLE "Customers" (
     "lastName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
-    "isApproved" BOOLEAN NOT NULL,
+    "secureSalt" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" INTEGER NOT NULL,
+    "createdBy" INTEGER,
     "updatedAt" TIMESTAMP(3),
     "updatedBy" INTEGER,
 
@@ -27,7 +27,7 @@ CREATE TABLE "Clients" (
     "address" TEXT NOT NULL,
     "isApproved" BOOLEAN NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" INTEGER NOT NULL,
+    "createdBy" INTEGER,
     "updatedAt" TIMESTAMP(3),
     "updatedBy" INTEGER,
 
@@ -41,14 +41,30 @@ CREATE TABLE "ClientUsers" (
     "lastName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
+    "secureSalt" TEXT NOT NULL,
     "clientId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" INTEGER NOT NULL,
+    "createdBy" INTEGER,
     "updatedAt" TIMESTAMP(3),
     "updatedBy" INTEGER,
 
     CONSTRAINT "ClientUsers_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Customers_email_key" ON "Customers"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Customers_phone_key" ON "Customers"("phone");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Clients_taxNumber_key" ON "Clients"("taxNumber");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ClientUsers_email_key" ON "ClientUsers"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ClientUsers_phone_key" ON "ClientUsers"("phone");
 
 -- AddForeignKey
 ALTER TABLE "ClientUsers" ADD CONSTRAINT "ClientUsers_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Clients"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

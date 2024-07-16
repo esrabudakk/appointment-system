@@ -17,11 +17,11 @@ model Customers {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   firstName  String
   lastName   String
-  email      String
-  phone      String
-  isApproved Boolean
+  email      String    @unique
+  phone      String    @unique
+  secureSalt String
   createdAt  DateTime  @default(now())
-  createdBy  Int
+  createdBy  Int?
   updatedAt  DateTime?
   updatedBy  Int?
 }
@@ -30,7 +30,7 @@ model Clients {
   id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   clientName  String
   clientType  String
-  taxNumber   String
+  taxNumber   String        @unique
   taxOffice   String
   status      String
   country     String
@@ -38,23 +38,24 @@ model Clients {
   address     String
   isApproved  Boolean
   createdAt   DateTime      @default(now())
-  createdBy   Int
+  createdBy   Int?
   updatedAt   DateTime?
   updatedBy   Int?
   clientUsers ClientUsers[]
 }
 
 model ClientUsers {
-  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  firstName String
-  lastName  String
-  email     String
-  phone     String
-  clientId  String    @db.Uuid
-  createdAt DateTime  @default(now())
-  createdBy Int
-  updatedAt DateTime?
-  updatedBy Int?
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  firstName  String
+  lastName   String
+  email      String    @unique
+  phone      String    @unique
+  secureSalt String
+  clientId   String    @db.Uuid
+  createdAt  DateTime  @default(now())
+  createdBy  Int?
+  updatedAt  DateTime?
+  updatedBy  Int?
 
   clients Clients @relation(fields: [clientId], references: [id])
 }
