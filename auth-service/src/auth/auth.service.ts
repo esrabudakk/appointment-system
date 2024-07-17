@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { SignUpRequest } from './request/sign-up.request';
-import { generateHashString } from './function/generate-hash.function';
-import { generateSalt } from './function/generate-salt.function';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { RedisService } from 'src/redis/redis.service';
 import { SignInRequest } from './request/sign-in.request';
 import { ClientUsers, Customers } from '@prisma/client';
 import { JwtPayload } from 'jsonwebtoken';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +15,17 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService,
   ) {}
+
+  private generateSalt(length: number): string {
+    return crypto
+      .randomBytes(Math.ceil(length / 2))
+      .toString('hex')
+      .slice(0, length);
+  }
+
+  private generateHashString(password: string, salt: string): string {
+    return crypto.createHmac('sha512', salt).update(password).digest('hex');
+  }
 
   async generateAccessToken(user: Customers | ClientUsers): Promise<string> {
     const payload = { username: user.email, sub: user.id };
@@ -28,9 +38,9 @@ export class AuthService {
   ): Promise<{ accessToken: string } | string> {
     const { firstName, lastName, phone, email, password } = signUpRequest;
 
-    const secureSalt = generateSalt(10);
+    const secureSalt = this.generateSalt(10);
 
-    const generatedHash = generateHashString(password, secureSalt);
+    const generatedHash = this.generateHashString(password, secureSalt);
 
     await this.redisService.set(email, generatedHash);
 
@@ -77,7 +87,10 @@ export class AuthService {
       return 'Invalid credentials';
     }
 
-    const generatedHash = generateHashString(password, foundUser.secureSalt);
+    const generatedHash = this.generateHashString(
+      password,
+      foundUser.secureSalt,
+    );
 
     if (redisHash !== generatedHash) {
       return 'Invalid credentials';
