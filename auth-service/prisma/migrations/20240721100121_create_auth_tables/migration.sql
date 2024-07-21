@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "ClientType" AS ENUM ('INDIVIDUAL', 'CORPORATE');
+
 -- CreateTable
 CREATE TABLE "Customers" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
@@ -6,6 +9,7 @@ CREATE TABLE "Customers" (
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "secureSalt" TEXT NOT NULL,
+    "hashedPassword" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" INTEGER,
     "updatedAt" TIMESTAMP(3),
@@ -18,14 +22,13 @@ CREATE TABLE "Customers" (
 CREATE TABLE "Clients" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "clientName" TEXT NOT NULL,
-    "clientType" TEXT NOT NULL,
+    "clientType" "ClientType" NOT NULL,
     "taxNumber" TEXT NOT NULL,
     "taxOffice" TEXT NOT NULL,
-    "status" TEXT NOT NULL,
     "country" TEXT NOT NULL,
     "city" TEXT NOT NULL,
     "address" TEXT NOT NULL,
-    "isApproved" BOOLEAN NOT NULL,
+    "isApproved" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" INTEGER,
     "updatedAt" TIMESTAMP(3),
@@ -42,6 +45,7 @@ CREATE TABLE "ClientUsers" (
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "secureSalt" TEXT NOT NULL,
+    "hashedPassword" TEXT NOT NULL,
     "clientId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" INTEGER,

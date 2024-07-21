@@ -6,6 +6,8 @@ import { SignInRequest } from './request/sign-in.request';
 import { ClientUsers, Customers } from '@prisma/client';
 import { JwtPayload } from 'jsonwebtoken';
 import * as crypto from 'crypto';
+import { SignUpClientRequest } from './request/sign-up-client.request';
+import { ClientType } from './enum/client-type.enum';
 
 @Injectable()
 export class AuthService {
@@ -59,6 +61,69 @@ export class AuthService {
         email,
         secureSalt,
         hashedPassword,
+        createdAt: new Date(),
+      },
+    });
+
+    const accessToken = await this.generateAccessToken(createdUser);
+
+    return { accessToken: accessToken };
+  }
+
+  async signUpClient(
+    signUpClientRequest: SignUpClientRequest,
+  ): Promise<{ accessToken: string } | string> {
+    const {
+      firstName,
+      lastName,
+      phone,
+      email,
+      password,
+      clientName,
+      clientType,
+      taxNumber,
+      taxOffice,
+      country,
+      city,
+      address,
+    } = signUpClientRequest;
+
+    const secureSalt = this.generateSalt(10);
+
+    const hashedPassword = this.generateHashString(password, secureSalt);
+
+    const foundUser = await this.prismaService.clientUsers.findFirst({
+      where: {
+        OR: [{ email }, { phone }],
+      },
+    });
+
+    if (foundUser) {
+      return 'User already exists';
+    }
+
+    const createdClient = await this.prismaService.clients.create({
+      data: {
+        clientName,
+        clientType: ClientType[clientType as keyof typeof ClientType],
+        taxNumber,
+        taxOffice,
+        country,
+        city,
+        address,
+        createdAt: new Date(),
+      },
+    });
+
+    const createdUser = await this.prismaService.clientUsers.create({
+      data: {
+        firstName,
+        lastName,
+        phone,
+        email,
+        secureSalt,
+        hashedPassword,
+        clientId: createdClient.id,
         createdAt: new Date(),
       },
     });

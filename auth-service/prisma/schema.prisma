@@ -27,17 +27,21 @@ model Customers {
   updatedBy      Int?
 }
 
+enum ClientType {
+  INDIVIDUAL
+  CORPORATE
+}
+
 model Clients {
   id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   clientName  String
-  clientType  String
+  clientType  ClientType
   taxNumber   String        @unique
   taxOffice   String
-  status      String
   country     String
   city        String
   address     String
-  isApproved  Boolean
+  isApproved  Boolean       @default(false)
   createdAt   DateTime      @default(now())
   createdBy   Int?
   updatedAt   DateTime?
