@@ -14,16 +14,17 @@ datasource db {
 }
 
 model Customers {
-  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  firstName  String
-  lastName   String
-  email      String    @unique
-  phone      String    @unique
-  secureSalt String
-  createdAt  DateTime  @default(now())
-  createdBy  Int?
-  updatedAt  DateTime?
-  updatedBy  Int?
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  firstName      String
+  lastName       String
+  email          String    @unique
+  phone          String    @unique
+  secureSalt     String
+  hashedPassword String
+  createdAt      DateTime  @default(now())
+  createdBy      Int?
+  updatedAt      DateTime?
+  updatedBy      Int?
 }
 
 model Clients {
@@ -45,17 +46,18 @@ model Clients {
 }
 
 model ClientUsers {
-  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  firstName  String
-  lastName   String
-  email      String    @unique
-  phone      String    @unique
-  secureSalt String
-  clientId   String    @db.Uuid
-  createdAt  DateTime  @default(now())
-  createdBy  Int?
-  updatedAt  DateTime?
-  updatedBy  Int?
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  firstName      String
+  lastName       String
+  email          String    @unique
+  phone          String    @unique
+  secureSalt     String
+  hashedPassword String
+  clientId       String    @db.Uuid
+  createdAt      DateTime  @default(now())
+  createdBy      Int?
+  updatedAt      DateTime?
+  updatedBy      Int?
 
   clients Clients @relation(fields: [clientId], references: [id])
 }

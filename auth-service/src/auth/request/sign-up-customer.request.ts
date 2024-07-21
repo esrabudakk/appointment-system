@@ -1,6 +1,6 @@
 import { IsString, IsEmail, IsPhoneNumber, MinLength } from 'class-validator';
 
-export class SignUpRequest {
+export class SignUpCustomerRequest {
   @IsString()
   firstName: string;
 

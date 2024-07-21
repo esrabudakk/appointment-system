@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { SignUpRequest } from './request/sign-up.request';
+import { SignUpCustomerRequest } from './request/sign-up-customer.request';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { RedisService } from 'src/redis/redis.service';
 import { SignInRequest } from './request/sign-in.request';
 import { ClientUsers, Customers } from '@prisma/client';
 import { JwtPayload } from 'jsonwebtoken';
@@ -13,7 +12,6 @@ export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly redisService: RedisService,
   ) {}
 
   private generateSalt(length: number): string {
@@ -33,16 +31,15 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 
-  async signUp(
-    signUpRequest: SignUpRequest,
+  async signUpCustomer(
+    signUpCustomerRequest: SignUpCustomerRequest,
   ): Promise<{ accessToken: string } | string> {
-    const { firstName, lastName, phone, email, password } = signUpRequest;
+    const { firstName, lastName, phone, email, password } =
+      signUpCustomerRequest;
 
     const secureSalt = this.generateSalt(10);
 
-    const generatedHash = this.generateHashString(password, secureSalt);
-
-    await this.redisService.set(email, generatedHash);
+    const hashedPassword = this.generateHashString(password, secureSalt);
 
     const foundUser = await this.prismaService.customers.findFirst({
       where: {
@@ -61,6 +58,7 @@ export class AuthService {
         phone,
         email,
         secureSalt,
+        hashedPassword,
         createdAt: new Date(),
       },
     });
@@ -74,8 +72,6 @@ export class AuthService {
     signInRequest: SignInRequest,
   ): Promise<{ accessToken: string } | string> {
     const { email, password } = signInRequest;
-
-    const redisHash = await this.redisService.get(email);
 
     const foundUser = await this.prismaService.customers.findFirst({
       where: {
@@ -92,7 +88,7 @@ export class AuthService {
       foundUser.secureSalt,
     );
 
-    if (redisHash !== generatedHash) {
+    if (foundUser.hashedPassword !== generatedHash) {
       return 'Invalid credentials';
     }
 

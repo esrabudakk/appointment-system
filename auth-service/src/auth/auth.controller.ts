@@ -1,17 +1,17 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignUpRequest } from './request/sign-up.request';
+import { SignUpCustomerRequest } from './request/sign-up-customer.request';
 import { SignInRequest } from './request/sign-in.request';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('sign-up')
-  async signUp(
-    @Body() signUpRequest: SignUpRequest,
+  @Post('customer/sign-up')
+  async signUpCustomer(
+    @Body() signUpRequest: SignUpCustomerRequest,
   ): Promise<{ accessToken: string } | string> {
-    const result = await this.authService.signUp(signUpRequest);
+    const result = await this.authService.signUpCustomer(signUpRequest);
     return result;
   }
 
